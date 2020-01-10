@@ -81,29 +81,32 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
             final String key = rateLimitKeyGenerator.key(request, route, policy);
             final Rate rate = rateLimiter.consume(policy, key, null);
-            final String httpHeaderKey = key.replaceAll("[^A-Za-z0-9-.]", "_").replaceAll("__", "_");
 
             final Long limit = policy.getLimit();
             final Long remaining = rate.getRemaining();
             if (limit != null) {
-                responseHeaders.put(HEADER_LIMIT + httpHeaderKey, String.valueOf(limit));
-                responseHeaders.put(HEADER_REMAINING + httpHeaderKey, String.valueOf(Math.max(remaining, 0)));
+                responseHeaders.put(HEADER_LIMIT, String.valueOf(limit));
+                responseHeaders.put(HEADER_REMAINING, String.valueOf(Math.max(remaining, 0)));
             }
 
             final Long quota = policy.getQuota();
             final Long remainingQuota = rate.getRemainingQuota();
             if (quota != null) {
                 request.setAttribute(REQUEST_START_TIME, System.currentTimeMillis());
-                responseHeaders.put(HEADER_QUOTA + httpHeaderKey, String.valueOf(quota));
-                responseHeaders.put(HEADER_REMAINING_QUOTA + httpHeaderKey,
+                responseHeaders.put(HEADER_QUOTA, String.valueOf(quota));
+                responseHeaders.put(HEADER_REMAINING_QUOTA,
                     String.valueOf(MILLISECONDS.toSeconds(Math.max(remainingQuota, 0))));
             }
 
-            responseHeaders.put(HEADER_RESET + httpHeaderKey, String.valueOf(rate.getReset()));
+            responseHeaders.put(HEADER_RESET, String.valueOf(rate.getReset()));
 
             if (properties.isAddResponseHeaders()) {
+            	String httpHeaderKey = "";
+            	if (properties.isAddSuffixRouteOnResponseHeaders()) {
+            		httpHeaderKey = "-" + key.replaceAll("[^A-Za-z0-9-.]", "_").replaceAll("__", "_");
+            	}
                 for (Map.Entry<String, String> headersEntry : responseHeaders.entrySet()) {
-                    response.setHeader(headersEntry.getKey(), headersEntry.getValue());
+                    response.setHeader(headersEntry.getKey() + httpHeaderKey, headersEntry.getValue());
                 }
             }
 

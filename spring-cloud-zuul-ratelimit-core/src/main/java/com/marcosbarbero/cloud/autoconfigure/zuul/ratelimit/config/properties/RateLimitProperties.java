@@ -65,6 +65,8 @@ public class RateLimitProperties {
 
     private boolean enabled;
 
+    private boolean addSuffixRouteOnResponseHeaders = true;
+
     private boolean addResponseHeaders = true;
 
     @NotNull
@@ -113,6 +115,14 @@ public class RateLimitProperties {
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
+
+    public boolean isAddSuffixRouteOnResponseHeaders() {
+        return addSuffixRouteOnResponseHeaders;
+    }
+
+    public void setAddSuffixRouteOnResponseHeaders(boolean addSuffixRouteOnResponseHeaders) {
+        this.addSuffixRouteOnResponseHeaders = addSuffixRouteOnResponseHeaders;
+	}
 
     public boolean isAddResponseHeaders() {
         return addResponseHeaders;
