@@ -66,7 +66,7 @@ public enum RateLimitType {
     URL {
         @Override
         public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
-            return route == null || route.getPath().startsWith(matcher);
+            return route == null || route.getPath().equalsIgnoreCase(matcher);
         }
 
         @Override
